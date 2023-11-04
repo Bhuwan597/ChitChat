@@ -10,7 +10,7 @@ import {
   Text,
   useToast,
 } from "@chakra-ui/react";
-import { ArrowBackIcon, ArrowForwardIcon } from "@chakra-ui/icons";
+import { ArrowBackIcon, ArrowForwardIcon, DeleteIcon } from "@chakra-ui/icons";
 import { getSender, getSenderProfile } from "../config/chatLogics";
 import Profile from "./miscellaneous/Profile";
 import UpdateGroupChatModal from "./miscellaneous/UpdateGroupChatModal";
@@ -20,6 +20,8 @@ import ScrollableChat from "./ScrollableChat";
 import io from "socket.io-client";
 import Lottie from "lottie-react";
 import animationData from "./Animation/typing.json";
+import ChatProfile from "./miscellaneous/ChatProfile";
+const { DateTime } = require("luxon");
 
 let socket, selectedChatCompare;
 
@@ -61,6 +63,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
           },
           config
         );
+        setFetchAgain(!fetchAgain)
         socket.emit("new message", data);
         setMessages([...messages, data]);
       } catch (error) {
@@ -177,11 +180,11 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             {!selectedChat.isGroupChat ? (
               <>
                 {getSender(user, selectedChat.users)}
-                <Profile user={getSenderProfile(user, selectedChat.users)} />
+                <ChatProfile fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} userProfile={getSenderProfile(user, selectedChat.users)} />
               </>
             ) : (
               <>
-                {selectedChat.chatName.toUpperCase()}
+              {selectedChat.chatName.toUpperCase()}
                 <UpdateGroupChatModal
                   fetchAgain={fetchAgain}
                   setFetchAgain={setFetchAgain}

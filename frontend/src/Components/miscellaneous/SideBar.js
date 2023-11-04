@@ -45,6 +45,10 @@ const SideBar = () => {
     history.push("/");
   };
 
+  const handleKeyDown = (e)=>{
+      if(e.key === 'Enter') handleSearch()
+  }
+
   const handleSearch = async () => {
     if (!search) {
       toast({
@@ -166,7 +170,7 @@ const SideBar = () => {
             />
           </MenuButton>
           <MenuList>
-            <Profile user={user}>
+            <Profile userProfile={user}>
               <MenuItem>Profile</MenuItem>
             </Profile>
             <MenuDivider />
@@ -187,6 +191,7 @@ const SideBar = () => {
                 mr={2}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={(e)=>handleKeyDown(e)}
               />
               <Button onClick={handleSearch}>Go</Button>
             </Box>

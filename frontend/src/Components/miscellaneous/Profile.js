@@ -1,8 +1,9 @@
-import { ViewIcon } from "@chakra-ui/icons";
+import { DeleteIcon, ViewIcon } from "@chakra-ui/icons";
 import { Button, IconButton, Image, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Text, useDisclosure } from "@chakra-ui/react";
 import React from "react";
+import ConfirmModal from "./ConfirmModal";
 
-const Profile = ({ user, children }) => {
+const Profile = ({ userProfile, children }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
     <>
@@ -15,11 +16,11 @@ const Profile = ({ user, children }) => {
       <Modal size={'lg'} isCentered isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader fontSize={'40px'} fontFamily={'Work sans'} display={'flex'} justifyContent={'center'}>{user.name}</ModalHeader>
+          <ModalHeader fontSize={'40px'} fontFamily={'Work sans'} display={'flex'} justifyContent={'center'}>{userProfile.name}</ModalHeader>
           <ModalCloseButton />
           <ModalBody display={'flex'} flexDir={'column'} alignItems={'center'} justifyContent={'space-between'} gap={4}>
-            <Image borderRadius={'full'} boxSize ={'150px'} src={user.picture} alt={user.name} />
-            <Text>Email : {user.email}</Text>
+            <Image borderRadius={'full'} boxSize ={'150px'} src={userProfile.picture} alt={userProfile.name} />
+            <Text>Email : {userProfile.email}</Text>
           </ModalBody>
 
           <ModalFooter>

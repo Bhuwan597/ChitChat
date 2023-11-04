@@ -159,4 +159,20 @@ const removeFromGroup = asyncHandler(
     }
 
 )
-module.exports = {accessChat, fetchChats, createGroupChat, renameGroup, addToGroup, removeFromGroup}
+
+const deleteChat = asyncHandler(async(req,res)=>{
+    const chat = await Chat.find({
+        _id: req.body.chatId,
+        users: { $elemMatch: { $eq: req.user._id } },
+      })
+        .populate("users", "-password")
+        .populate("latestMessage");
+
+    if(chat.length !== 0){
+        return res.send(await Chat.deleteOne({ _id: req.body.chatId }))
+    }
+    res.status(400)
+    throw new Error('Chat Not Found')
+})
+
+module.exports = {accessChat, fetchChats, createGroupChat, renameGroup, addToGroup, removeFromGroup, deleteChat}
