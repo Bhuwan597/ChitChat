@@ -21,10 +21,11 @@ import io from "socket.io-client";
 import Lottie from "lottie-react";
 import animationData from "./Animation/typing.json";
 
-const ENDPOINT = "http://localhost:5000";
 let socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
+  // const ENDPOINT = 'http://localhost:5000'
+  const ENDPOINT = 'https://chitchat-vvuo.onrender.com'
   const { user, selectedChat, setSelectedChat, notification, setNotification } = ChatState();
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
