@@ -7,7 +7,11 @@ import MyChats from '../Components/MyChats'
 import ChatBox from '../Components/ChatBox'
 
 const Chats = () => {
-  const {user} = ChatState()
+  const {user,setUser} = ChatState()
+  useEffect(() => {
+    setUser(JSON.parse(localStorage.getItem('userInfo')))
+  })
+  
   const [fetchAgain, setFetchAgain] = useState(false)
   return <>
     <div style={{width:"100%"}}>
