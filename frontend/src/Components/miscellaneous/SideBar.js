@@ -128,7 +128,7 @@ const SideBar = () => {
           </Button>
         </Tooltip>
         <Text fontSize={"2xl"} fontFamily={"work sans"} fontWeight={"bold"}>
-          ChatApp
+          ChitChat
         </Text>
         <div>
         <Menu>

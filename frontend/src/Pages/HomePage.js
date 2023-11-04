@@ -32,8 +32,9 @@ const HomePage = () => {
         margin={"40px 0 15px 0"}
         borderRadius={"lg"}
         borderWidth={"1px"}
+        width={'100%'}
       >
-        <Text fontSize={"4xl"}>ChatApp</Text>
+        <Text width={'100%'} textAlign={'center'} fontSize={"4xl"}>ChitChat</Text>
       </Box>
       <Box
         bg={"white"}

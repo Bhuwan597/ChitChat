@@ -109,7 +109,6 @@ return (
       </InputGroup>
     </FormControl>
     <Button colorScheme='blue' width={'100%'} mt={'1.5'} onClick={submitHandle} isLoading={loading}>Login</Button>
-    <Button variant={'solid'} colorScheme='red' width={'100%'} mt={'1.5'} onClick={()=>{setEmail('guest@gmail.com'); setPassword('123456')}}>Guest Login</Button>
     </form>
   </VStack>
 );

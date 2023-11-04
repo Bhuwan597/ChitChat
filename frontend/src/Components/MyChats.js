@@ -9,10 +9,12 @@ import GroupChatModal from './miscellaneous/GroupChatModal'
 
 const MyChats = ({fetchAgain}) => {
   const [loggedUser, setLoggedUser] = useState(null)
+  const [loading, setLoading] = useState(false)
   const {setUser, user, setSelectedChat, selectedChat, chats, setChats} = ChatState()
   const toast = useToast()
 
   const fetchChats = async()=>{
+    setLoading(true)
     try {
       const config = {
         headers: {
@@ -22,7 +24,6 @@ const MyChats = ({fetchAgain}) => {
 
       const {data} = await axios.get('/api/chats', config)
       setChats(data)
-      console.log(chats)
     } catch (error) {
       toast({
         title: 'Error Occured!',
@@ -33,6 +34,7 @@ const MyChats = ({fetchAgain}) => {
         position: 'bottom-left'
       })
     }
+    setLoading(false)
   }
   useEffect(()=>{
     setLoggedUser(JSON.parse(localStorage.getItem('userInfo')))
@@ -75,6 +77,7 @@ const MyChats = ({fetchAgain}) => {
       borderRadius={'lg'}
       overflow={'hidden'}
       >
+      {loading?<ChatLoading/>:<>
       {chats?(
         <Stack overflowY={'scroll'}>
             {chats.map((chat)=>{
@@ -99,6 +102,8 @@ const MyChats = ({fetchAgain}) => {
       ):(
         <ChatLoading/>
       )}
+      </>}
+      
       </Box>
     </Box>
   </>

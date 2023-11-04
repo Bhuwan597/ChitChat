@@ -13,13 +13,6 @@ const sendMessage = asyncHandler(async(req,res)=>{
         res.status(400)
         throw new Error('Invalid data passed into request')
     }
-    const isAccessible = await Chat.find({
-            users: { $elemMatch: { $eq: req.user._id } } 
-    })
-    if(isAccessible.length ===0){
-        res.status(401)
-        throw new Error('You are not part of this chat!')
-    }
     let newMessage = {
         sender: req.user._id,
         content: content,
@@ -51,10 +44,6 @@ const allMessages = asyncHandler(
             })
             .populate('sender', 'name picture email')
             .populate('chat')
-            if(!(messages[0].chat.users.includes(req.user._id))){
-                res.status(401)
-                throw new Error('You are not part of this chat!')
-            }
             res.json(messages)
         } catch (error) {
             res.status(400)
