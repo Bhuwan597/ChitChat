@@ -179,9 +179,10 @@ const MyChats = ({ fetchAgain }) => {
                             >
                               <div style={{ display: "flex" }}>
                                 <Text fontSize={"0.8rem"} fontWeight={"bold"}>
-                                  {chat.isGroupChat ? (
-                                    sender.name + " :"
-                                  ) : isYou(sender, user) }
+                                  {chat.isGroupChat &&  
+                                    sender.name + " :"}
+                                    {(!chat.isGroupChat && !newUser && (user._id === sender._id) ) && 'You : '}
+                                    {!chat.isGroupChat && !newUser && !(user._id === sender._id) && `${sender.name} : ` + ' '}
                                 </Text>
                                 <Text fontSize={"0.8rem"}>
                                   {content &&

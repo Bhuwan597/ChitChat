@@ -18,17 +18,16 @@ import axios from "axios";
 import "./style.css";
 import ScrollableChat from "./ScrollableChat";
 import io from "socket.io-client";
-import Lottie from "lottie-react";
 import animationData from "./Animation/typing.json";
 import ChatProfile from "./miscellaneous/ChatProfile";
-const { DateTime } = require("luxon");
+import TypingBubble from '../Components/miscellaneous/TypingBubble'
 
 let socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
-  // const ENDPOINT = 'http://localhost:5000'
+  // const ENDPOINT = 'http://localhost:3000'
   const ENDPOINT = 'https://chitchat-vvuo.onrender.com'
-  const { user, selectedChat, setSelectedChat, notification, setNotification } = ChatState();
+  const { user, selectedChat, setSelectedChat, notification, setNotification, chats, setChats } = ChatState();
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState();
@@ -63,7 +62,15 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
           },
           config
         );
-        setFetchAgain(!fetchAgain)
+        chats.map((chat,i)=>{
+            chat.users.map((user,j)=>{
+              if(user._id === data.sender._id && chat.chatName === 'sender' &&  selectedChat._id === chat._id){
+                chats[i].latestMessage.sender.name = 'You : '
+                chats[i].latestMessage.content = data.content
+               return setChats(chats)
+              }
+            })
+        })
         socket.emit("new message", data);
         setMessages([...messages, data]);
       } catch (error) {
@@ -219,12 +226,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                 </div>
                 {isTyping ? (
                   <div>
-                    {/* <Lottie
-                      options={defaultOptions}
-                      width={70}
-                      style={{ marginBottom: 15, marginLeft: 0 }}
-                    /> */}
-                    Typing. . . . . .
+                    {<TypingBubble/>}
                   </div>
                 ) : (
                   <></>
@@ -245,6 +247,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                   placeholder="Type a message. . . . . . . . ."
                   onChange={typingHandler}
                   value={newMessage}
+                  autoComplete="off"
                 />
                 {/* <Button id="send-message" onClick={sendMessage} colorScheme={'yellow'} w={20} rightIcon={<ArrowForwardIcon/>}></Button> */}
               </FormControl>

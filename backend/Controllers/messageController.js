@@ -20,11 +20,19 @@ const sendMessage = asyncHandler(async(req,res)=>{
     }
     try {
         let message = await Message.create(newMessage)
-        message = await message.populate('sender', 'name picture email')
+        message = await message.populate('sender', 'name picture email _id')
         message = await message.populate('chat')
         message = await User.populate(message, {
             path : 'chat.users',
-            select: 'name picture email'
+            select: 'name picture email _id'
+        })
+        message = await Message.populate(message, {
+            path : 'chat.latestMessage',
+            select: 'sender',
+            populate: {
+                path: 'sender',
+                select: '-password'
+            }
         })
         await Chat.findByIdAndUpdate(chatId, {
             latestMessage : message
