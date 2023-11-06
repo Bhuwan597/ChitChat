@@ -1,0 +1,26 @@
+.pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 14px;
+    color: #fff;
+    text-align: center;
+    min-width: 60px;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 5px;
+    background-color: white;
+  }
+
+  .online {
+    background-color: #4CAF50; /* Green */
+  }
+
+  .offline {
+    background-color: #F44336; /* Red */
+  }

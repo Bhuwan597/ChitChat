@@ -70,7 +70,7 @@ const io = require("socket.io")(server, {
     origin: `http://localhost:${process.env.PORT}`,
   },
 });
-
+const activeUsersByRoom = new Map();
 io.on("connection", (socket) => {
   console.log("Connected to socket.io");
   socket.on("setup", (userData) => {
@@ -78,10 +78,17 @@ io.on("connection", (socket) => {
     socket.emit("connected");
   });
 
-  socket.on("join chat", (room) => {
+  socket.on("join chat", (room, userId) => {
     socket.join(room);
+    if (!activeUsersByRoom.has(room)) {
+      activeUsersByRoom.set(room, new Set());
+    }
+    activeUsersByRoom.get(room).add(userId);
     console.log("User joined room ", room);
   });
+  socket.off('join chat', (room)=>{
+    console.log('Chat disconnected for ', room)
+  })
 
   socket.on('typing', (room)=> socket.in(room).emit('typing'))
 
@@ -95,10 +102,25 @@ io.on("connection", (socket) => {
       socket.in(user._id).emit("message recieved", newMessageRecieved);
     });
   });
-
   socket.off('setup', ()=>{
     console.log("USEER DISCONNECTED")
     socket.leave(userData._id)
   })
+  socket.on("disconnect", () => {
+    console.log('Some user disconnected')
+    // Handle user disconnection
+    // Remove the user from the list of active users in all rooms they joined
+    for (const [room, activeUsers] of activeUsersByRoom) {
+      if (activeUsers.has(socket.id)) {
+        activeUsers.delete(socket.id);
+      }
+    }
+  });
 
+  // Check if a user is active in a specific chat room
+  socket.on("checkUserActivity", (room, userId, callback) => {
+    const activeUsers = activeUsersByRoom.get(room) || new Set();
+    const isActive = activeUsers.has(userId);
+    callback(isActive);
+  });
 });

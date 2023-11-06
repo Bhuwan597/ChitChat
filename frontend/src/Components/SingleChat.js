@@ -21,6 +21,7 @@ import io from "socket.io-client";
 import animationData from "./Animation/typing.json";
 import ChatProfile from "./miscellaneous/ChatProfile";
 import TypingBubble from '../Components/miscellaneous/TypingBubble'
+import ActiveBadge from '../Components/miscellaneous/ActiveBadge'
 
 let socket, selectedChatCompare;
 
@@ -34,6 +35,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [socketConnected, setSocketConnected] = useState(false);
   const [typing, setTyping] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  const [isOnline, setIsOnline] = useState(false);
   const toast = useToast();
   const defaultOptions = {
     loop: true,
@@ -64,7 +66,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         );
         chats.map((chat,i)=>{
             chat.users.map((user,j)=>{
-              if(user._id === data.sender._id && chat.chatName === 'sender' &&  selectedChat._id === chat._id){
+              if(user._id === data.sender._id && chat.chatName === 'sender' &&  selectedChat._id === chat._id && chat.latestMessage){
                 chats[i].latestMessage.sender.name = 'You : '
                 chats[i].latestMessage.content = data.content
                return setChats(chats)
@@ -74,6 +76,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         socket.emit("new message", data);
         setMessages([...messages, data]);
       } catch (error) {
+        console.log(error)
         toast({
           title: "Error Occured!",
           description: "Failed to send Message",
@@ -87,6 +90,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   };
 
   const fetchMessages = async () => {
+
     if (!selectedChat) return;
     try {
       setLoading(true);
@@ -101,7 +105,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       );
       setMessages(data);
       setLoading(false);
-      socket.emit("join chat", selectedChat._id);
+      socket.emit("join chat", selectedChat._id, user._id);
+      socket.emit('iamonline', user._id)
     } catch (error) {
       toast({
         title: "Error Occured!",
@@ -143,9 +148,13 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       }
     });
   });
-
   const typingHandler = async (e) => {
     setNewMessage(e.target.value);
+    const userToBeChecked = selectedChat.users.filter((u)=> u._id !== user._id)
+    socket.emit("checkUserActivity", selectedChat._id, userToBeChecked[0]._id, (isActive) => {
+      // Receive the server's response and update the UI
+      setIsOnline(isActive);
+    });
     // typing indicator
     if (!socketConnected) return;
     if (!typing) {
@@ -163,7 +172,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       }
     }, timerLength);
   };
-
   return (
     <>
       {selectedChat ? (
@@ -187,6 +195,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             {!selectedChat.isGroupChat ? (
               <>
                 {getSender(user, selectedChat.users)}
+                {isOnline? <ActiveBadge status='online'/> :  <ActiveBadge status='offline'/>}
                 <ChatProfile fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} userProfile={getSenderProfile(user, selectedChat.users)} />
               </>
             ) : (

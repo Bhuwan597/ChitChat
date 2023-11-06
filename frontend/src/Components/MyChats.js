@@ -154,8 +154,7 @@ const MyChats = ({ fetchAgain }) => {
                                   display={"inline"}
                                   fontWeight={"semibold"}
                                 >
-                                  {" "}
-                                  is connected with you. Tap to send message
+                                  {(chat.isGroupChat && !chat.latestMessage) ? ' has connected you to group.' : ' is connected with you. Tap to send message.' }
                                 </Text>
                               )}
                               {chat.isGroupChat && (
@@ -179,7 +178,7 @@ const MyChats = ({ fetchAgain }) => {
                             >
                               <div style={{ display: "flex" }}>
                                 <Text fontSize={"0.8rem"} fontWeight={"bold"}>
-                                  {chat.isGroupChat &&  
+                                  {(chat.isGroupChat && chat.latestMessage) &&  
                                     sender.name + " :"}
                                     {(!chat.isGroupChat && !newUser && (user._id === sender._id) ) && 'You : '}
                                     {!chat.isGroupChat && !newUser && !(user._id === sender._id) && `${sender.name} : ` + ' '}

@@ -13,6 +13,8 @@ import {
   ModalHeader,
   ModalOverlay,
   Spinner,
+  Text,
+  space,
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
@@ -21,9 +23,9 @@ import { ChatState } from "../../contexts/ChatProvider";
 import UserBadgeItem from "../UserAvatar/UserBadgeItem";
 import axios from "axios";
 import UserListItem from "../UserAvatar/UserListItem";
-import ConfirmModal  from '../miscellaneous/ConfirmModal'
+import ConfirmModal from "../miscellaneous/ConfirmModal";
 
-const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain , fetchMessages}) => {
+const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [groupChatName, setGroupChatName] = useState("");
   const { selectedChat, setSelectedChat, user } = ChatState();
@@ -61,7 +63,7 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain , fetchMessages}) => {
       );
       user1._id === user._id ? setSelectedChat() : setSelectedChat(data);
       setFetchAgain(!fetchAgain);
-      fetchMessages()
+      fetchMessages();
       setLoading(false);
     } catch (error) {
       toast({
@@ -192,6 +194,50 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain , fetchMessages}) => {
       });
     }
   };
+  const handleGroupChatDelete = async (groupChat) => {
+    if (selectedChat.groupAdmin._id !== user._id) {
+      toast({
+        title: "Only Admin can Delete this group!",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "top",
+      });
+      return;
+    }
+    try {
+      setLoading(true);
+      const config = {
+        headers : {
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+      const { data } = await axios.post(
+        'api/chats/delete',
+        { chatId : selectedChat._id },
+        config
+      );
+      setLoading(false)
+      setSelectedChat(null)
+      setFetchAgain(!fetchAgain)
+      toast({
+        title: "Conversation Deleted Successfully!",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "top-left",
+      });
+    } catch (error) {
+      toast({
+        title: "Error Occured!",
+        description: "Failed to delete the conversation",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "top-left",
+      });
+    }
+  };
   return (
     <>
       <IconButton
@@ -207,17 +253,21 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain , fetchMessages}) => {
           <ModalCloseButton />
           <ModalBody>
             <Box>
-              {selectedChat.users.map((u) => (
-                <ConfirmModal
-                key={u._id}
-                action={'remove'}
-                handleFunction={() => handleRemove(u)}
-                >
-                <UserBadgeItem
-                  user={u}
-                />
-                </ConfirmModal>
-              ))}
+              {selectedChat.users.map((u) => {
+                const result = selectedChat.groupAdmin._id === u._id;
+                return (
+                  <>
+                    {"       "}
+                    <ConfirmModal
+                      key={u._id}
+                      action={"remove"}
+                      handleFunction={() => handleRemove(u)}
+                    >
+                      <UserBadgeItem isAdmin={result} userProfile={u} />
+                    </ConfirmModal>
+                  </>
+                );
+              })}
             </Box>
             <form>
               <FormControl display={"flex"}>
@@ -262,12 +312,21 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain , fetchMessages}) => {
           </ModalBody>
 
           <ModalFooter>
-          {/* onClick={() => handleRemove(user)} */}
-            
-            <ConfirmModal action={'leave'} handleFunction={()=>handleRemove(user)} >
-            <Button  colorScheme="red">
-              Leave Group
-            </Button>
+            {/* onClick={() => handleRemove(user)} */}
+
+            <ConfirmModal
+              action={"delete"}
+              handleFunction={() => handleGroupChatDelete(selectedChat)}
+            >
+              <Button mr={3} colorScheme="blackAlpha">
+                Delete this group
+              </Button>
+            </ConfirmModal>
+            <ConfirmModal
+              action={"leave"}
+              handleFunction={() => handleRemove(user)}
+            >
+              <Button colorScheme="red">Leave Group</Button>
             </ConfirmModal>
           </ModalFooter>
         </ModalContent>

@@ -8,6 +8,7 @@ const userModel = mongoose.Schema(
         email: {type: String, required:true, unique:true},
         password: {type: String, required:true},
         picture: {type: String, default: 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8dXNlcnxlbnwwfHwwfHx8MA%3D%3D'},
+        isHidden: {type: Boolean, default: false}
     }, {
         timestamps: true,
     }

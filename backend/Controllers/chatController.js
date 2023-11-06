@@ -2,6 +2,7 @@ const asyncHandler = require('express-async-handler')
 
 const Chat = require("../models/ChatModel");
 const User = require('../models/UserModel');
+const Message = require('../models/MessageModel');
 
 const accessChat = asyncHandler(async (req,res)=>{
     const {userId} = req.body
@@ -169,6 +170,9 @@ const deleteChat = asyncHandler(async(req,res)=>{
         .populate("latestMessage");
 
     if(chat.length !== 0){
+       await Message.deleteMany({
+             chat : req.body.chatId
+            }); 
         return res.send(await Chat.deleteOne({ _id: req.body.chatId }))
     }
     res.status(400)

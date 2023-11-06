@@ -163,7 +163,7 @@ const GroupChatModal = ({ children }) => {
                   return (
                     <UserBadgeItem
                       key={user._id}
-                      user={u}
+                      userProfile={u}
                       handleFunction={() => handleDelete(u)}
                     />
                   );

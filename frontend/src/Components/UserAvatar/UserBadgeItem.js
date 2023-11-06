@@ -1,8 +1,10 @@
 import { CloseIcon } from '@chakra-ui/icons'
 import { Box, Button } from '@chakra-ui/react'
 import React from 'react'
+import { ChatState } from '../../contexts/ChatProvider'
 
-const UserBadgeItem = ({user, handleFunction}) => {
+const UserBadgeItem = ({userProfile, handleFunction, isAdmin}) => {
+  const {user} =ChatState()
   return (
     <>
         <Button 
@@ -20,7 +22,8 @@ const UserBadgeItem = ({user, handleFunction}) => {
             backgroundColor : "red.500"
         }}
         >
-        {user.name}
+        {userProfile.name}
+        {isAdmin && ' (Admin)'}
         <CloseIcon pl={1}/> 
         </Button>
     </>

@@ -3,7 +3,7 @@ const User = require("../models/UserModel");
 const generateToken = require("../config/generateToken");
 
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password, picture } = req.body;
+  const { name, email, password, picture , isHidden} = req.body;
   if (!name || !email || !password) {
     res.status(400);
     throw new Error("Please enter all the fields.");
@@ -21,6 +21,7 @@ const registerUser = asyncHandler(async (req, res) => {
     email,
     password,
     picture,
+    isHidden
   });
   if (user) {
     res.status(201).json({
@@ -48,6 +49,7 @@ const authUser = asyncHandler(async (req, res) => {
       name: user.name,
       email: user.email,
       picture: user.picture,
+      isHidden: user.isHidden,
       token: generateToken(user._id),
     });
   } else {
@@ -59,16 +61,44 @@ const authUser = asyncHandler(async (req, res) => {
   }
 });
 
-const allUsers = asyncHandler(async (req,res)=>{
-    const keyword = req.query.search?{
-        $or : [
-            {name: {$regex: req.query.search, $options: 'i'}},
-            {email: {$regex: req.query.search, $options: 'i'}},
-        ]
-    }:{}
-    const users = await User.find(keyword).find({_id:{$ne: req.user._id}}).select('-password')
-    res.send(users)
-    
+const allUsers = asyncHandler(async (req, res) => {
+  const search = req.query.search;
+  const conditions = [];
+
+  if (search) {
+      conditions.push({
+          $or: [
+              { name: { $regex: search, $options: 'i' } },
+              { email: { $regex: search, $options: 'i' } },
+          ]
+      });
+  }
+
+  conditions.push({ $or: [{ isHidden: false }, { isHidden: null }] });
+
+  const keyword = { $and: conditions };
+
+  const users = await User.find(keyword).where('_id').ne(req.user._id).select('-password');
+  res.send(users);
+});
+
+
+const updateUserInfo = asyncHandler(async(req,res)=>{
+  if(!req.body){
+    res.status(400);
+    throw new Error("Cant Update!");
+  }
+  if(!req.body.name) req.body.name = req.user.name
+  if(req.body.isHidden === null) req.body.isHidden = req.user.isHidden
+  const user = await User.findByIdAndUpdate(req.user._id, req.body, {new : true})
+  return res.status(201).json({
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    picture: user.picture,
+    isHidden: user.isHidden,
+    token: generateToken(user._id),
+  });
 })
 
-module.exports = { registerUser, authUser, allUsers };
+module.exports = { registerUser, authUser, allUsers, updateUserInfo };
